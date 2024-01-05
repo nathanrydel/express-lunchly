@@ -17,7 +17,7 @@ class Customer {
     this.notes = notes;
   }
 
-  /** find all customers. @classmethod */
+  /** find all customers. */
 
   static async all() {
     const results = await db.query(
@@ -32,7 +32,7 @@ class Customer {
     return results.rows.map(c => new Customer(c));
   }
 
-  /** get a customer by ID. @classmethod */
+  /** get a customer by ID. */
 
   static async get(id) {
     const results = await db.query(
@@ -59,10 +59,7 @@ class Customer {
 
   /**get a customer by first name and last name */
 
-  static async getByName(firstName, lastName) {
-    // TODO: Not flexible search, needs 2 and only 2 params to function
-    firstName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
-    lastName = lastName.charAt(0).toUpperCase() + lastName.slice(1);
+  static async search(searchTerm) {
 
     const results = await db.query(
       `SELECT id,
@@ -71,17 +68,19 @@ class Customer {
               phone,
               notes
            FROM customers
-           WHERE first_name = $1 AND last_name = $2
-           ORDER BY last_name, first_name`,
-      [firstName, lastName]
+           WHERE CONCAT(first_name, ' ', last_name) ILIKE $1
+           ORDER BY last_name, first_name;`,
+      [`%${searchTerm}%`]
     );
 
     // Check if results has any customers
     if (results.rows.length === 0) {
-      throw new NotFoundError(`No such customer: ${firstName} ${lastName}`);
+      throw new NotFoundError(`No such customer: ${searchTerm}`);
     }
     return results.rows.map(c => new Customer(c));
   }
+
+  /** get list of top ten customers by number of reservations  */
 
   static async getTopTen() {
     const results = await db.query(
@@ -136,7 +135,7 @@ class Customer {
     }
   }
 
-  /** @property create full customer name and return. */
+  /** create full customer name and return. */
 
   fullName() {
     return `${this.firstName} ${this.lastName}`;
