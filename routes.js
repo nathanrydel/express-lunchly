@@ -13,22 +13,18 @@ const router = new express.Router();
 /** Homepage: show list of customers. */
 
 router.get("/", async function (req, res, next) {
-  //if there are search query strings(name)
-  //call on a method to get customer by name
-  //redirect to customer detail page
   let customers;
-  if (req.query.search) {
-    let firstAndLastName = req.query.search.split(" ");
-    let firstName = firstAndLastName[0];
-    let lastName = firstAndLastName[1];
 
-    customers = await Customer.getByName(firstName, lastName);
+  if (req.query.search) {
+    customers = await Customer.search(req.query.search);
   } else {
     customers = await Customer.all();
   }
 
   return res.render("customer_list.html", { customers });
 });
+
+/**Shows top ten customers by number of reservations. */
 
 router.get("/top-ten/", async function (req, res, next) {
   const customers = await Customer.getTopTen();
