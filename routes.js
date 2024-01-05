@@ -17,15 +17,21 @@ router.get("/", async function (req, res, next) {
   //call on a method to get customer by name
   //redirect to customer detail page
   let customers;
-  if(req.query.search){
-    let firstAndLastName = req.query.search.split(" ")
+  if (req.query.search) {
+    let firstAndLastName = req.query.search.split(" ");
     let firstName = firstAndLastName[0];
     let lastName = firstAndLastName[1];
 
     customers = await Customer.getByName(firstName, lastName);
-  }else{
+  } else {
     customers = await Customer.all();
   }
+
+  return res.render("customer_list.html", { customers });
+});
+
+router.get("/top-ten/", async function (req, res, next) {
+  const customers = await Customer.getTopTen();
 
   return res.render("customer_list.html", { customers });
 });
