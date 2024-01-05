@@ -59,6 +59,9 @@ class Customer {
   /**get a customer by first name and last name */
 
   static async getByName(firstName, lastName) {
+    firstName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+    lastName = lastName.charAt(0).toUpperCase() + lastName.slice(1);
+
     const results = await db.query(
       `SELECT id,
               first_name AS "firstName",
@@ -70,6 +73,12 @@ class Customer {
            ORDER BY last_name, first_name`,
            [firstName, lastName]
     );
+
+    if (results === undefined) {
+      const err = new Error(`No such customer: ${firstName} ${lastName}}`);
+      err.status = 404;
+      throw err;
+    }
     return results.rows.map(c => new Customer(c));
   }
 
