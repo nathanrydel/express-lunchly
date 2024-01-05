@@ -3,6 +3,7 @@
 /** Customer for Lunchly */
 
 const db = require("../db");
+const { NotFoundError } = require("../expressError");
 const Reservation = require("./reservation");
 
 /** Customer of the restaurant. */
@@ -71,13 +72,12 @@ class Customer {
            FROM customers
            WHERE first_name = $1 AND last_name = $2
            ORDER BY last_name, first_name`,
-           [firstName, lastName]
+      [firstName, lastName]
     );
 
-    if (results === undefined) {
-      const err = new Error(`No such customer: ${firstName} ${lastName}}`);
-      err.status = 404;
-      throw err;
+    // Check if results has any customers
+    if (results.rows.length === 0) {
+      throw new NotFoundError(`No such customer: ${firstName} ${lastName}`);
     }
     return results.rows.map(c => new Customer(c));
   }
