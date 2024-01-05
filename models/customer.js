@@ -90,6 +90,14 @@ class Customer {
       );
     }
   }
+
+  /** @property create full customer name and return. */
+
+  fullName() {
+    return `${this.firstName} ${this.lastName}`;
+  }
+
+
 }
 
 module.exports = Customer;
