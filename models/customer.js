@@ -73,6 +73,7 @@ class Customer {
       [`%${searchTerm}%`]
     );
 
+    // TODO:fix error handling--maybe in template
     // Check if results has any customers
     if (results.rows.length === 0) {
       throw new NotFoundError(`No such customer: ${searchTerm}`);
